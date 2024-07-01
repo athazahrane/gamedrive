@@ -5,7 +5,7 @@
         <img src="{{ asset('storage/' . $post->image) }}" class="card-img-top object-fit-cover" style="max-height: 300px;"
             alt="{{ $post->title }}">
         <div class="card-body">
-            <h5 class="card-title">{{ $post->title }}</h5>
+            <h5 class="card-title text-capitalize">{{ $post->title }}</h5>
             <p class="card-text"><small class="text-body-secondary">Last updated
                     {{ $post->updated_at->diffForHumans() }}</small></p>
             <p class="card-text">{{ $post->description }}</p>
@@ -22,9 +22,20 @@
             </div>
 
             <div class="mb-3">
+                <label for="name_game" class="form-label">Game</label>
+                <input type="text" class="form-control @error('name_game') is-invalid @enderror" id="name_game"
+                    value="{{ $post->title }}" name="name_game" readonly required>
+                @error('name_game')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
+            <div class="mb-3">
                 <label for="tlp">No Telpon</label>
                 <input type="number" name="no_tlp" id="no-tlp"
-                    class="form-control @error('no_tlp') is-invalid @enderror" required value="{{ old('no_tlp') }}">
+                    class="form-control @error('no_tlp') is-invalid @enderror" required value="{{ old('no_tlp') }}" min="12">
                 @error('no_tlp')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -47,7 +58,7 @@
             <div class="mb-3">
                 <label for="topupOption" class="form-label">Pilih Topup</label>
                 <select class="form-select @error('option') is-valid @enderror" id="topupOption" name="topupOption" required
-                    name="option" value="{{ old('option') }}">
+                    value="{{ old('option') }}">
                     <option value="" class="mb-5" selected disabled>Pilih opsi topup</option>
                     @if (is_array($post->jenisTopUp) && is_array($post->price))
                         @foreach ($post->jenisTopUp as $index => $jenisTopUp)

@@ -46,3 +46,8 @@
 .navbar .form-control {
   padding: .75rem 1rem;
 }
+
+.card-invoice {
+  width: 100%;
+  background-color: #fff;
+}

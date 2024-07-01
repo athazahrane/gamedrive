@@ -9,12 +9,13 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->string('email');
-            $table->string('no_tlp', 12);
+            $table->string('name_game');
+            $table->string('no_tlp');
             $table->string('name');
             $table->string('username');
             $table->string('option');
@@ -25,7 +26,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('payments');
     }

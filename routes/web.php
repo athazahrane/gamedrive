@@ -11,7 +11,6 @@ Route::get('/', function () {
     return view('welcome', [
         "title" => "Landing",
     ]);
-
 });
 
 Route::get('/auth', [LoginController::class, 'index'])->middleware('guest');
@@ -35,8 +34,10 @@ Route::get('/my-dashboard/post/{post}/edit', [DashboardPostController::class, 'e
 Route::put('/my-dashboard/post/{post}', [DashboardPostController::class, 'update'])->name('post.update');
 
 Route::get('/my-dashboard/post/{post}/topup', [DashboardPostController::class, 'topup'])->name('post.topup');
-// Route::post('/my-dashboard/post', [DashboardPostController::class, 'formTopup'])->middleware('auth');
 Route::post('/my-dashboard/post/{post}/topup', [DashboardPostController::class, 'formTopup'])->name('post.formTopup')->middleware('auth');
-Route::get('/my-dashboard/post//topup/invoice', [DashboardPostController::class, 'invoice']);
+Route::get('/invoice', [DashboardPostController::class, 'invoice'])->name('invoice');
+Route::get('/download-pdf', [DashboardPostController::class, 'downloadPDF'])->withoutMiddleware('web');
 
 Route::get('/my-dashboard/joki', [JokiController::class, 'index'])->middleware('auth');
+
+Route::post('/confirm-payment', [DashboardPostController::class, 'confirmPayment'])->name('post.confirmPayment');

@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+ini_set('max_execution_time', 300);
+ini_set('memory_limit', '256M');
+
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Payments;
+use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardPostController extends Controller
 {
@@ -136,31 +141,56 @@ class DashboardPostController extends Controller
         ]);
     }
 
-    public function formTopup(Request $request)
+    public function formTopup(Request $request, Post $post)
     {
         $request->validate([
-            'email' => 'email:dns|required',
-            'no_tlp' => 'numeric|min:12|required',
-            'name' => 'required|min:3',
-            'username' => 'required|min:3',
-            'option' => 'required'
+            'email' => 'required|email',
+            "name_game" => "required",
+            'no_tlp' => 'required|numeric|min:12',
+            'nama' => 'required|string',
+            'topupOption' => 'required|string',
         ]);
-
+    
         $payment = new Payments();
         $payment->email = $request->email;
+        $payment->name_game = $request->name_game;
         $payment->no_tlp = $request->no_tlp;
-        $payment->name = $request->name;
-        $payment->username = $request->username;
-        $payment->option = $request->option;
-        $payment->save();
-
-        return view('dashboard.post.invoice', ['payment' => $payment]);
+        $payment->name = $request->nama;
+        $payment->username = Auth::user()->username;
+        $payment->option = $request->topupOption;
+    
+        session(['payment_data' => $payment]);
+    
+        return redirect()->route('invoice');
     }
-
+    
     public function invoice()
     {
-        return view('dashboard.post.invoice', [
+        $payment = session('payment_data');
+    
+        if (!$payment) {
+            return redirect()->route('post.topup');
+        }
+    
+        return view('dashboard.post.invoice', compact('payment'), [
             'title' => 'Invoice',
         ]);
+    }
+    
+    public function confirmPayment(Request $request)
+    {
+        $payment = session('payment_data');
+    
+        if (!$payment) {
+            return redirect()->route('post.topup');
+        }
+    
+        $payment->save();
+    
+        // Generate PDF
+        $pdf = PDF::loadView('dashboard.post.pdf', compact('payment'));
+        session()->forget('payment_data');
+    
+        return $pdf->download('invoice.pdf');
     }
 }
