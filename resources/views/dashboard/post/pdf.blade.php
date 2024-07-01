@@ -10,7 +10,9 @@
 </head>
 
 <style>
-    
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
     h4 {
         margin: 0;
     }
@@ -103,26 +105,26 @@
     <div class="margin-top">
         <table class="products">
             <tr>
-                <th>Qty</th>
+                <th>No</th>
                 <th>Description</th>
                 <th>Price</th>
             </tr>
             <tr class="items">
                 <td>
-                    1
+                    1   {{-- ganti supaya angka nya bertambah jika banyak opsi yang user buat --}}
                 </td>
                 <td>
                     {{ $payment->option }}
                 </td>
-                <td>
-                    $129.00 USD
+                <td style="color: #DC3545;">
+                    Rp 5.000 - {{-- ganti dengan harga per produk --}}
                 </td>
             </tr>
         </table>
     </div>
 
-    <div class="total">
-        Total: $129.00 USD
+    <div class="total" style="color: #DC3545;">
+        Total: Rp 5.000 - {{-- jumlahkan semua harga produk yang ada --}}
     </div>
 
     <div class="footer margin-top">

@@ -1,6 +1,7 @@
 @extends('dashboard.layouts.main')
 
 @section('container')
+
     <div class="card mt-4 mb-3">
         <img src="{{ asset('storage/' . $post->image) }}" class="card-img-top object-fit-cover" style="max-height: 300px;"
             alt="{{ $post->title }}">
@@ -35,7 +36,8 @@
             <div class="mb-3">
                 <label for="tlp">No Telpon</label>
                 <input type="number" name="no_tlp" id="no-tlp"
-                    class="form-control @error('no_tlp') is-invalid @enderror" required value="{{ old('no_tlp') }}" min="12">
+                    class="form-control @error('no_tlp') is-invalid @enderror" required value="{{ old('no_tlp') }}"
+                    min="12">
                 @error('no_tlp')
                     <div class="invalid-feedback">
                         {{ $message }}
@@ -45,7 +47,8 @@
 
             <div class="mb-3">
                 <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" value="{{ auth()->user()->name }}" name="nama">
+                <input type="text" class="form-control" id="name" value="{{ auth()->user()->name }}"
+                    name="nama">
             </div>
 
             <div class="mb-3">
@@ -75,11 +78,59 @@
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-success">Pesan Sekarang</button>
+            {{-- <div class="add-btn d-flex justify-content-end gap-2">
+                <button class="btn btn-primary">+ tambah opsi topup</button>
+                <button class="btn btn-danger">hapus opsi</button>
+            </div> --}}
 
-            <a href="/my-dashboard/post" class="btn btn-danger text-decoration-none">Kembali</a>
+            <div class="end-card mt-5 d-flex justify-content-between">
+                <div class="btn-grp">
+                    <button type="submit" class="btn btn-success">Pesan Sekarang</button>
+                    <a href="/my-dashboard/post" class="btn btn-danger text-decoration-none">Kembali</a>
+                </div>
+
+                <div class="total-price">
+                    <h6>Jumlah yang harus dibayar : </h6>
+                    <span id="totalPrice" class="text-danger d-flex justify-content-end">Rp 10.000 -</span>
+                </div>
+            </div>
         </form>
     </div>
 
     <canvas class="my-4 w-100" id="myChart" width="900" height="390"></canvas>
+
+    @if (session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: '{{ session('success') }}',
+            });
+        </script>
+    @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch(window.location.href)
+                .then(response => {
+                    if (response.headers.get('X-Success-Message')) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.headers.get('X-Success-Message'),
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.addEventListener('mouseenter', Swal.stopTimer);
+                                toast.addEventListener('mouseleave', Swal.resumeTimer);
+                            }
+                        });
+                    }
+                });
+        });
+    </script>
+
 @endsection

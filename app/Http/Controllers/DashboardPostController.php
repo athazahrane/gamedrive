@@ -150,7 +150,7 @@ class DashboardPostController extends Controller
             'nama' => 'required|string',
             'topupOption' => 'required|string',
         ]);
-    
+
         $payment = new Payments();
         $payment->email = $request->email;
         $payment->name_game = $request->name_game;
@@ -158,39 +158,46 @@ class DashboardPostController extends Controller
         $payment->name = $request->nama;
         $payment->username = Auth::user()->username;
         $payment->option = $request->topupOption;
-    
-        session(['payment_data' => $payment]);
-    
+
+        session(['payment_data' => $payment, 'post_id' => $post->id]);
+
         return redirect()->route('invoice');
     }
-    
+
     public function invoice()
     {
         $payment = session('payment_data');
-    
+        $post_id = session('post_id');
+
         if (!$payment) {
-            return redirect()->route('post.topup');
+            return redirect()->route('post.topup', ['post' => $post_id]);
         }
-    
-        return view('dashboard.post.invoice', compact('payment'), [
+
+        return view('dashboard.post.invoice', compact('payment', 'post_id'), [
             'title' => 'Invoice',
         ]);
     }
-    
+
     public function confirmPayment(Request $request)
     {
         $payment = session('payment_data');
-    
+        $post_id = session('post_id');
+
         if (!$payment) {
-            return redirect()->route('post.topup');
+            return redirect()->route('post.topup', ['post' => $post_id]);
         }
-    
+
         $payment->save();
-    
-        // Generate PDF
+
         $pdf = PDF::loadView('dashboard.post.pdf', compact('payment'));
-        session()->forget('payment_data');
-    
-        return $pdf->download('invoice.pdf');
+        session()->forget(['payment_data', 'post_id']);
+
+        session()->flash('success', 'Pembayaran berhasil dikonfirmasi. Invoice telah diunduh.');
+
+        return $pdf->download('invoice.pdf', [
+            'Refresh' => '5;url=' . route('post.topup', ['post' => $post_id])
+        ])->withHeaders([
+            'X-Success-Message' => 'Pembayaran berhasil dikonfirmasi. Invoice telah diunduh.'
+        ]);
     }
 }

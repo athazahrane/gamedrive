@@ -51,3 +51,39 @@
   width: 100%;
   background-color: #fff;
 }
+
+
+table {
+  border-collapse: collapse;
+  margin: 20px 0;
+  width: 100%;
+  overflow: auto;
+}
+
+th {
+  background-color: #f1f1f1;
+}
+
+th, td {
+  padding: 1rem;
+}
+
+tr:nth-of-type(2n) {
+  background-color: #fefafa;
+}
+
+@media (max-width: 750px) {
+  th {
+    display: none;
+  }
+  td {
+    display: block;
+  }
+  td::before {
+    content: attr(data-table) " : ";
+    font-weight: 700;
+    margin-right: 10px;
+    text-transform: capitalize;
+
+  }
+}

@@ -4,21 +4,64 @@
     <h3 class="mt-4">Konfirmasi pembelian:</h3>
     <hr>
 
-    <div class="card-invoice d-flex flex-column gap-4 p-4 shadow mt-4 rounded">
-        <span class="fw-bold">Game: <p class="fw-normal d-inline">{{ $payment->name_game }}</p></span>
-        <span class="fw-bold">Email: <p class="fw-normal d-inline">{{ $payment->email }}</p></span>
-        <span class="fw-bold">No Telpon: <p class="fw-normal d-inline">{{ $payment->no_tlp }}</p></span>
-        <span class="fw-bold">Nama: <p class="fw-normal d-inline">{{ $payment->name }}</p></span>
-        <span class="fw-bold">Username: <p class="fw-normal d-inline">{{ $payment->username }}</p></span>
-        <span class="fw-bold">Option: <p class="fw-normal d-inline">{{ $payment->option }}</p></span>
-        <div class="grp-btn d-flex gap-2">
-            <form action="{{ route('post.confirmPayment') }}" method="post">
-                @csrf
-                <button type="submit" class="btn btn-success" style="max-width: max-content">Konfirmasi Pembayaran</button>
-            </form>
-            <a href="/my-dashboard/post/{post}/topup" class="btn btn-danger" style="max-width: max-content">Kembali</a>
-        </div>
+    <table class="shadow rounded">
+        <thead>
+            <tr>
+                <th class="text-capitalize">no</th>
+                <th class="text-capitalize">game</th>
+                <th class="text-capitalize">email</th>
+                <th class="text-capitalize">no telpon</th>
+                <th class="text-capitalize">nama</th>
+                <th class="text-capitalize">username</th>
+                <th class="text-capitalize">option</th>
+                <th class="text-capitalize">price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td data-table="no" >1</td>
+                <td data-table="game" class="text-capitalize">{{ $payment->name_game }}</td>
+                <td data-table="email" >{{ $payment->email }}</td>
+                <td data-table="no telpon" >{{ $payment->no_tlp }}</td>
+                <td data-table="nama" >{{ $payment->name }}</td>
+                <td data-table="username" >{{ $payment->username }}</td>
+                <td data-table="option" >{{ $payment->option }}</td>
+                <td data-table="price" class="text-danger">Rp 5.000</td> {{-- ganti dengan harga price produk nya --}}
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="total-price d-flex flex-column align-items-end">
+        <h6>Jumlah yang harus dibayar : </h6>
+        <span id="totalPrice" class="text-danger d-flex justify-content-end">Rp 10.000 -</span> {{-- totalkan dengan semua price produk nya --}}
+    </div>
+
+    <div class="grp-btn d-flex gap-2">
+        <form action="{{ route('post.confirmPayment') }}" method="post" id="confirm-form">
+            @csrf
+            <button type="submit" class="btn btn-success" style="max-width: max-content">Konfirmasi Pembelian</button>
+        </form>
+        <a href="{{ route('post.topup', ['post' => $post_id]) }}" class="btn btn-danger" style="max-width: max-content">Kembali</a>
     </div>
 
     <canvas class="my-4 w-100" id="myChart" width="900" height="390"></canvas>
+
+    <script>
+        document.getElementById('confirm-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var form = event.target;
+
+            var iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.onload = function() {
+                setTimeout(function() {
+                    window.location.href = '{{ route('post.topup', ['post' => $post_id]) }}';
+                }, 2000);
+            };
+            iframe.src = form.action;
+            document.body.appendChild(iframe);
+
+            form.submit();
+        });
+    </script>
 @endsection

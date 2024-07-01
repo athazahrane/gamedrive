@@ -33,8 +33,9 @@ Route::resource('/my-dashboard/post', DashboardPostController::class)->middlewar
 Route::get('/my-dashboard/post/{post}/edit', [DashboardPostController::class, 'edit'])->name('post.edit');
 Route::put('/my-dashboard/post/{post}', [DashboardPostController::class, 'update'])->name('post.update');
 
-Route::get('/my-dashboard/post/{post}/topup', [DashboardPostController::class, 'topup'])->name('post.topup');
 Route::post('/my-dashboard/post/{post}/topup', [DashboardPostController::class, 'formTopup'])->name('post.formTopup')->middleware('auth');
+Route::get('/my-dashboard/post/{post}/topup', [DashboardPostController::class, 'topup'])->name('post.topup');
+
 Route::get('/invoice', [DashboardPostController::class, 'invoice'])->name('invoice');
 Route::get('/download-pdf', [DashboardPostController::class, 'downloadPDF'])->withoutMiddleware('web');
 
