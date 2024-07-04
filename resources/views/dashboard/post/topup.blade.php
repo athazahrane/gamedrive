@@ -58,40 +58,42 @@
             </div>
 
             {{-- Option Topup Game --}}
-            <div class="mb-3">
-                <label for="topupOption" class="form-label">Pilih Topup</label>
-                <select class="form-select @error('option') is-valid @enderror" id="topupOption" name="topupOption" required
-                    value="{{ old('option') }}">
-                    <option value="" class="mb-5" selected disabled>Pilih opsi topup</option>
-                    @if (is_array($post->jenisTopUp) && is_array($post->price))
-                        @foreach ($post->jenisTopUp as $index => $jenisTopUp)
-                            <option value="{{ $jenisTopUp }}">
-                                {{ $jenisTopUp }} - Rp {{ number_format($post->price[$index], 0, ',', '.') }}
-                            </option>
-                        @endforeach
-                    @endif
-                </select>
-                @error('option')
-                    <div class="invalid-feedback">
-                        {{ $message }}
-                    </div>
-                @enderror
+            <div id="optionContainer">
+                <div class="mb-3 option-wrapper">
+                    <label for="topupOption" class="form-label">Pilih Topup</label>
+                    <select class="form-select @error('topupOption') is-invalid @enderror" id="topupOption"
+                        name="topupOption[]" required>
+                        <option value="" selected disabled>Pilih opsi topup</option>
+                        @if (is_array($post->jenisTopUp) && is_array($post->price))
+                            @foreach ($post->jenisTopUp as $index => $jenisTopUp)
+                                <option value="{{ $jenisTopUp }}" data-price="{{ $post->price[$index] }}">
+                                    {{ $jenisTopUp }} - Rp {{ number_format($post->price[$index], 0, ',', '.') }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                    @error('topupOption')
+                        <div class="invalid-feedback">
+                            {{ $message }}
+                        </div>
+                    @enderror
+                </div>
             </div>
 
-            {{-- <div class="add-btn d-flex justify-content-end gap-2">
-                <button class="btn btn-primary">+ tambah opsi topup</button>
-                <button class="btn btn-danger">hapus opsi</button>
-            </div> --}}
+            <div class="add-btn d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-primary" id="addOptionBtn">+ tambah opsi topup</button>
+                <button type="button" class="btn btn-danger" id="removeOptionBtn">hapus opsi</button>
+            </div>
 
             <div class="end-card mt-5 d-flex justify-content-between">
                 <div class="btn-grp">
-                    <button type="submit" class="btn btn-success">Pesan Sekarang</button>
+                    <button type="submit" class="btn btn-success">Pesan Sekarang</button> {{-- ketika user sudah mengisi semua form dan form nya valid , saya ingin user akan diarahkan ke halaman invoive sambil membawa data yang user isi di halaman topup --}}
                     <a href="/my-dashboard/post" class="btn btn-danger text-decoration-none">Kembali</a>
                 </div>
 
-                <div class="total-price">
-                    <h6>Jumlah yang harus dibayar : </h6>
-                    <span id="totalPrice" class="text-danger d-flex justify-content-end">Rp 10.000 -</span>
+                <div class="total-price mb-3">
+                    <h6>Jumlah yang harus dibayar :</h6>
+                    <span id="totalPrice" class="text-danger d-flex justify-content-end">Rp 0</span>
                 </div>
             </div>
         </form>
@@ -130,6 +132,55 @@
                         });
                     }
                 });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addOptionBtn = document.getElementById('addOptionBtn');
+            const removeOptionBtn = document.getElementById('removeOptionBtn');
+            const totalPriceSpan = document.getElementById('totalPrice');
+            let totalPrice = 0;
+
+            function updateTotalPrice() {
+                totalPrice = 0;
+                const selects = document.querySelectorAll('select[name="topupOption[]"]');
+                selects.forEach(select => {
+                    const selectedOption = select.options[select.selectedIndex];
+                    const price = parseFloat(selectedOption.getAttribute('data-price'));
+                    if (!isNaN(price)) {
+                        totalPrice += price;
+                    }
+                });
+                totalPriceSpan.textContent = 'Rp ' + totalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+
+            updateTotalPrice();
+
+            addOptionBtn.addEventListener('click', function() {
+                const originalSelect = document.querySelector('.option-wrapper');
+                const newSelect = originalSelect.cloneNode(true);
+                newSelect.querySelector('select').selectedIndex = 0;
+                newSelect.classList.add('my-3');
+                document.getElementById('optionContainer').appendChild(newSelect);
+                updateTotalPrice();
+            });
+
+            removeOptionBtn.addEventListener('click', function() {
+                const selectCount = document.querySelectorAll('select[name="topupOption[]"]').length;
+                if (selectCount > 1) {
+                    const selects = document.querySelectorAll('select[name="topupOption[]"]');
+                    const lastSelect = selects[selects.length - 1];
+                    lastSelect.parentNode.removeChild(lastSelect);
+                    updateTotalPrice();
+                }
+            });
+
+            document.addEventListener('change', function(e) {
+                if (e.target && e.target.matches('select[name="topupOption[]"]')) {
+                    updateTotalPrice();
+                }
+            });
         });
     </script>
 

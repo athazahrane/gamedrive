@@ -145,10 +145,11 @@ class DashboardPostController extends Controller
     {
         $request->validate([
             'email' => 'required|email',
-            "name_game" => "required",
+            'name_game' => 'required',
             'no_tlp' => 'required|numeric|min:12',
             'nama' => 'required|string',
-            'topupOption' => 'required|string',
+            'topupOption' => 'required|array|min:1', // Minimal pilih 1 option
+            'topupOption.*' => 'required|string',
         ]);
 
         $payment = new Payments();
@@ -157,9 +158,28 @@ class DashboardPostController extends Controller
         $payment->no_tlp = $request->no_tlp;
         $payment->name = $request->nama;
         $payment->username = Auth::user()->username;
-        $payment->option = $request->topupOption;
 
-        session(['payment_data' => $payment, 'post_id' => $post->id]);
+        $options = [];
+        $totalPrice = 0;
+
+        foreach ($request->topupOption as $option) {
+            if (in_array($option, $post->jenisTopUp)) {
+                $index = array_search($option, $post->jenisTopUp);
+                $price = $post->price[$index];
+
+                $options[] = [
+                    'jenisTopUp' => $option,
+                    'price' => $price,
+                ];
+
+                $totalPrice += $price;
+            }
+        }
+
+        $payment->options = $options;
+
+        // Simpan data payment dan total price dalam session
+        session(['payment_data' => $payment, 'post_id' => $post->id, 'total_price' => $totalPrice]);
 
         return redirect()->route('invoice');
     }
@@ -168,12 +188,13 @@ class DashboardPostController extends Controller
     {
         $payment = session('payment_data');
         $post_id = session('post_id');
+        $totalPrice = session('total_price');
 
         if (!$payment) {
             return redirect()->route('post.topup', ['post' => $post_id]);
         }
 
-        return view('dashboard.post.invoice', compact('payment', 'post_id'), [
+        return view('dashboard.post.invoice', compact('payment', 'post_id', 'totalPrice'), [
             'title' => 'Invoice',
         ]);
     }
@@ -199,5 +220,19 @@ class DashboardPostController extends Controller
         ])->withHeaders([
             'X-Success-Message' => 'Pembayaran berhasil dikonfirmasi. Invoice telah diunduh.'
         ]);
+    }
+
+    public function generatePDF()
+    {
+        $payment = session('payment_data');
+        $totalPrice = session('total_price');
+
+        if (!$payment || !$totalPrice) {
+            // Handle error jika data tidak ada dalam session
+            return redirect()->route('topup')->with('error', 'Data pembayaran tidak ditemukan.');
+        }
+
+        $pdf = PDF::loadView('your_view_file', compact('payment', 'totalPrice'));
+        return $pdf->download('invoice.pdf');
     }
 }

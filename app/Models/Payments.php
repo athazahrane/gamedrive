@@ -2,18 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Payments extends Model
 {
-    use HasFactory;
+    protected $fillable = ['email', 'name_game', 'no_tlp', 'name', 'username', 'options'];
 
-    protected $fillable = [
-        'email',
-        'no_tlp',
-        'name',
-        'username',
-        'option',
+    protected $casts = [
+        'options' => 'array',
     ];
 }

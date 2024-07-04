@@ -97,11 +97,8 @@
             });
 
             function formatCurrency(input) {
-                // Menghilangkan semua karakter kecuali angka
                 var value = input.value.replace(/\D/g, '');
-                // Format dengan pemisah ribuan titik
                 value = new Intl.NumberFormat('id-ID').format(value);
-                // Tambahkan 'Rp ' di depan dan hasilnya ke input
                 input.value = value === 'NaN' ? '' : 'Rp ' + value;
             }
         });

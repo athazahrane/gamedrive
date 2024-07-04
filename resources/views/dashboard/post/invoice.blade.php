@@ -18,22 +18,24 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td data-table="no" >1</td>
-                <td data-table="game" class="text-capitalize">{{ $payment->name_game }}</td>
-                <td data-table="email" >{{ $payment->email }}</td>
-                <td data-table="no telpon" >{{ $payment->no_tlp }}</td>
-                <td data-table="nama" >{{ $payment->name }}</td>
-                <td data-table="username" >{{ $payment->username }}</td>
-                <td data-table="option" >{{ $payment->option }}</td>
-                <td data-table="price" class="text-danger">Rp 5.000</td> {{-- ganti dengan harga price produk nya --}}
-            </tr>
+            @foreach (session('payment_data')->options as $index => $option)
+                <tr>
+                    <td data-table="no">{{ $index + 1 }}</td>
+                    <td data-table="game" class="text-capitalize">{{ session('payment_data')->name_game }}</td>
+                    <td data-table="email">{{ session('payment_data')->email }}</td>
+                    <td data-table="no telpon">{{ session('payment_data')->no_tlp }}</td>
+                    <td data-table="nama">{{ session('payment_data')->name }}</td>
+                    <td data-table="username">{{ session('payment_data')->username }}</td>
+                    <td data-table="option">{{ $option['jenisTopUp'] }}</td>
+                    <td data-table="price" class="text-danger">Rp {{ number_format($option['price'], 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
 
     <div class="total-price d-flex flex-column align-items-end">
-        <h6>Jumlah yang harus dibayar : </h6>
-        <span id="totalPrice" class="text-danger d-flex justify-content-end">Rp 10.000 -</span> {{-- totalkan dengan semua price produk nya --}}
+        <h6>Jumlah yang harus dibayar :</h6>
+        <span id="totalPrice" class="text-danger d-flex justify-content-end">Rp {{ number_format($totalPrice, 0, ',', '.') }}</span>
     </div>
 
     <div class="grp-btn d-flex gap-2">
@@ -41,7 +43,8 @@
             @csrf
             <button type="submit" class="btn btn-success" style="max-width: max-content">Konfirmasi Pembelian</button>
         </form>
-        <a href="{{ route('post.topup', ['post' => $post_id]) }}" class="btn btn-danger" style="max-width: max-content">Kembali</a>
+        <a href="{{ route('post.topup', ['post' => $post_id]) }}" class="btn btn-danger"
+            style="max-width: max-content">Kembali</a>
     </div>
 
     <canvas class="my-4 w-100" id="myChart" width="900" height="390"></canvas>
