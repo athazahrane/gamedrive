@@ -6,6 +6,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PetugasController;
 
 Route::get('/', function () {
     return view('welcome', [
@@ -31,3 +32,19 @@ Route::get('/download-pdf', [DashboardPostController::class, 'downloadPDF'])->wi
 
 Route::get('/my-dashboard/joki', [JokiController::class, 'index'])->middleware('auth');
 Route::post('/confirm-payment', [DashboardPostController::class, 'confirmPayment'])->name('post.confirmPayment');
+
+Route::middleware(['auth', 'isAdmin'])->group(function () {
+    // edit akun petugas
+    Route::get('/my-dashboard/admin', [PetugasController::class, 'index'])->name('admin.index');
+    Route::get('/my-dashboard/admin/edit/{id}', [PetugasController::class, 'show'])->name('admin.edit');
+    Route::put('/my-dashboard/admin/update/{id}', [PetugasController::class, 'update'])->name('admin.update');
+
+    // create akun petugas
+    Route::get('/my-dashboard/admin/create-petugas', [PetugasController::class, 'create'])->name('admin.create-petugas');
+    Route::post('/my-dashboard/admin/create-petugas', [PetugasController::class, 'store'])->name('admin.store-petugas');
+
+    // suspend, banned, recovery
+    Route::put('/my-dashboard/admin/suspend/{id}', [PetugasController::class, 'suspend'])->name('admin.suspend');
+    Route::delete('/my-dashboard/admin/ban/{id}', [PetugasController::class, 'ban'])->name('admin.ban');
+    Route::put('/my-dashboard/admin/recover/{id}', [PetugasController::class, 'recover'])->name('admin.recover');
+});

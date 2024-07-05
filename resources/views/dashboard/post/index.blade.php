@@ -7,11 +7,14 @@
         </h1>
     </div>
 
-    <div class="btn-admin-group">
-        <a href="/my-dashboard/post/create" class="text-decoration-none d-block ms-auto mb-3" style="max-width: max-content">
-            <button class="btn btn-secondary">+ Buat data jasa topup baru</button>
-        </a>
-    </div>
+    @if (auth()->user()->isAdmin())
+        <div class="btn-admin-group">
+            <a href="/my-dashboard/post/create" class="text-decoration-none d-block ms-auto mb-3"
+                style="max-width: max-content">
+                <button class="btn btn-secondary">+ Buat data jasa topup baru</button>
+            </a>
+        </div>
+    @endif
 
     {{-- delete data --}}
     @if (session('success'))
@@ -54,13 +57,16 @@
                     <h5 class="card-title">{{ $post->title }}</h5>
                     <p class="card-text">{{ $post->description }}</p>
                     <a href="{{ route('post.topup', $post->id) }}" class="btn btn-primary">Topup sekarang</a>
-                    <form action="{{ route('post.destroy', $post->id) }}" method="POST" style="display: inline-block;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger"
-                            onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus data</button>
-                    </form>
-                    <a href="{{ route('post.edit', $post->id) }}" class="btn btn-warning my-2">Edit data</a>
+
+                    @if (auth()->user()->isAdmin())
+                        <form action="{{ route('post.destroy', $post->id) }}" method="POST" style="display: inline-block;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger"
+                                onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus data</button>
+                        </form>
+                        <a href="{{ route('post.edit', $post->id) }}" class="btn btn-warning my-2">Edit data</a>
+                    @endif
                 </div>
             </div>
         @endforeach
